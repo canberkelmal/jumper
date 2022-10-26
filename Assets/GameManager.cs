@@ -30,10 +30,12 @@ public class GameManager : MonoBehaviour
     public Text height;
     public Text stars;
     public Text clock;
+    int item;
     // Start is called before the first frame update
     void Start()
     {
         
+        player.transform.GetChild(0).gameObject.SetActive(true);
     }
     
     void FixedUpdate(){
@@ -121,9 +123,16 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(scene.name);        
     }
 
+    public void bombed(){
+        alive=false;
+        leaveCamera();
+        player.transform.GetChild(0).gameObject.SetActive(false);
+    }
+
     void leaveCamera(){
         if(alive==false){
             cam.transform.parent=null;
+            rainOn=false;
 
             player.transform.GetComponent<Rigidbody2D>().simulated=false;
             LoseScreen.SetActive(true);
@@ -150,11 +159,11 @@ public class GameManager : MonoBehaviour
             rained=true;
 
             if(!rainOnMe){
-                Instantiate(cam.transform.GetChild(0), CoinIn.transform.position+ new Vector3(Random.Range(-3,3), 0, 0), Quaternion.identity, coins.transform);
+                Instantiate(ItemCreator(), CoinIn.transform.position+ new Vector3(Random.Range(-3,3), 0, 0), Quaternion.identity, coins.transform);
             }
 
             if(rainOnMe){
-                Instantiate(cam.transform.GetChild(0), CoinIn.transform.position, Quaternion.identity, coins.transform);
+                Instantiate(ItemCreator(), CoinIn.transform.position, Quaternion.identity, coins.transform);
             }
 
             for(int i=0;i<coins.transform.childCount;i++){
@@ -167,6 +176,19 @@ public class GameManager : MonoBehaviour
         }
         yield return new WaitForSeconds(DeltaStarDrop);
         StartCoroutine(coinRain());
+    }
+
+    public GameObject ItemCreator(){
+        item=Random.Range(1,11);
+        Debug.Log(item.ToString());
+        if(item>7){
+            return cam.transform.GetChild(3).gameObject;
+            //Debug.Log(item.ToString() + "bomb");
+        }
+        else{
+            return cam.transform.GetChild(0).gameObject;
+            //Debug.Log(item.ToString() + " coin");
+        }
     }
 
     IEnumerator Timer(){
