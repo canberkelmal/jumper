@@ -31,11 +31,21 @@ public class GameManager : MonoBehaviour
     public Text stars;
     public Text clock;
     int item;
-    // Start is called before the first frame update
+                    //\\        
+                   ///\\\
+                  ///--\\\
+                 ///----\\\
+                ///------\\\
+               ///////\\\\\\\
+              ///----------\\\
+             ///------------\\\
+            ///--------------\\\
+    //---------------------------------\\
     void Start()
     {
         
         player.transform.GetChild(0).gameObject.SetActive(true);
+        alive=true;
     }
     
     void FixedUpdate(){
@@ -48,18 +58,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void ColorChanging(GameObject a)
-    {
-        fadeTime=floorFadeIn*37.5f;
-        if (fadeStart < fadeTime)
-        {
-            fadeStart += Time.deltaTime * fadeTime;
- 
-            a.GetComponent<SpriteRenderer>().color= Color.Lerp(floorFirstColor, floorLastColor, fadeStart);
-        }
-    }
-
-    // Update is called once per frame
     void Update(){
 
         
@@ -113,20 +111,36 @@ public class GameManager : MonoBehaviour
         }
 
     }
-
-    public void getCoin(){
-        starCounter++;
+    
+    void ColorChanging(GameObject a)
+    {
+        fadeTime=floorFadeIn*37.5f;
+        if (fadeStart < fadeTime)
+        {
+            fadeStart += Time.deltaTime * fadeTime;
+ 
+            a.GetComponent<SpriteRenderer>().color= Color.Lerp(floorFirstColor, floorLastColor, fadeStart);
+        }
     }
-
+    
     public void restart(){
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);        
+    }
+
+    public void getCoin(){
+        starCounter++;
     }
 
     public void bombed(){
         alive=false;
         leaveCamera();
         player.transform.GetChild(0).gameObject.SetActive(false);
+    }
+
+    public void expand(){
+        floors.transform.GetChild(0).GetComponent<BoxCollider2D>().size +=new Vector2(0.2f, 0);
+        floors.transform.GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().size+=new Vector2(1.46f, 0);
     }
 
     void leaveCamera(){
@@ -151,7 +165,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    
+    public GameObject ItemCreator(){
+        item=Random.Range(1,11);
+        Debug.Log(item.ToString());
+
+        
+        //return cam.transform.GetChild(4).gameObject;
+        
+        if(item>9){
+            return cam.transform.GetChild(3).gameObject;
+            //Debug.Log(item.ToString() + "bomb");
+        }
+        else if(item<8){
+            return cam.transform.GetChild(0).gameObject;
+            //Debug.Log(item.ToString() + " coin");
+        }
+        else{
+            return cam.transform.GetChild(4).gameObject;
+            //Debug.Log(item.ToString() + "expand");
+        }
+    }
 
     IEnumerator coinRain(){
 
@@ -176,19 +209,6 @@ public class GameManager : MonoBehaviour
         }
         yield return new WaitForSeconds(DeltaStarDrop);
         StartCoroutine(coinRain());
-    }
-
-    public GameObject ItemCreator(){
-        item=Random.Range(1,11);
-        Debug.Log(item.ToString());
-        if(item>7){
-            return cam.transform.GetChild(3).gameObject;
-            //Debug.Log(item.ToString() + "bomb");
-        }
-        else{
-            return cam.transform.GetChild(0).gameObject;
-            //Debug.Log(item.ToString() + " coin");
-        }
     }
 
     IEnumerator Timer(){
